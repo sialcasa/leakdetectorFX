@@ -36,7 +36,10 @@ public class LeakingView extends VBox {
             }
 
             if (newValue.equals("remove")) {
-                ((VBox) getParent()).getChildren().remove(this);
+                if(getParent()!=null){
+                    ((VBox) getParent()).getChildren().remove(this);
+                }
+
             }
 
             if (newValue.equals("showhbox")) {

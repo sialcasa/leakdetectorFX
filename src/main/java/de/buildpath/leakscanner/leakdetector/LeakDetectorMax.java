@@ -29,6 +29,7 @@ public class LeakDetectorMax extends LeakDetectorBase {
 
     private final List<Object> listeners = new ArrayList<>();
     private boolean buildTreeViewRunning=false;
+    private boolean getRootNodesRunning=false;
 
     public ObservableSet<WeakRef<Node>> getRootParents() {
         return rootParents;
@@ -69,9 +70,14 @@ public class LeakDetectorMax extends LeakDetectorBase {
     // get root Node of this element
 
     protected Set<WeakRef<Node>> getRootNodes() {
-        rootParents.clear();
+        if(!getRootNodesRunning){
+            rootParents.clear();
+        }
+
         List<WeakRef<Node>> weakRefsList = new ArrayList<>();
+        getRootNodesRunning=true;
         for (WeakRef<Node> WeakRef : leakedObjects) {
+            getRootNodesRunning=true;
             WeakRef<Node> WeakRefTmp = WeakRef;
             WeakRef<Node> topParentWeakRef = WeakRefTmp;
             if (WeakRefTmp != null && WeakRefTmp.get() != null) {
@@ -89,7 +95,7 @@ public class LeakDetectorMax extends LeakDetectorBase {
         for (WeakRef weakRef : weakRefsList) {
             checkAndAddToRootNodes(weakRef);
         }
-
+        getRootNodesRunning=false;
         return rootParents;
 
     }
@@ -116,14 +122,15 @@ public class LeakDetectorMax extends LeakDetectorBase {
     protected void buildTreeView() {
 
         // clear root treeItem and add current rootparents again
-//        if(!buildTreeViewRunning){
-//            rootItem.getChildren().clear();
-//        }
+        if(!buildTreeViewRunning){
+            rootItem.getChildren().clear();
+        }
 
         List<TreeItem<WeakRef<Node>>> parentRootItems = new ArrayList<>();
 //        ObservableSet<WeakRef<Node>> rootParentsa = FXCollections.observableSet(rootParents);
         buildTreeViewRunning=true;
         for (WeakRef<Node> rootParent : rootParents) {
+            buildTreeViewRunning=true;
             if (rootParent.get() != null) {
                 WeakRef<Node> weakRefParent = rootParent;
                 TreeItem<WeakRef<Node>> parentRootItem = new TreeItem<>(weakRefParent);
@@ -144,7 +151,7 @@ public class LeakDetectorMax extends LeakDetectorBase {
             }
         }
         rootItem.getChildren().addAll(parentRootItems);
-//        buildTreeViewRunning=false;
+        buildTreeViewRunning=false;
 
     }
 
