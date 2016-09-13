@@ -38,6 +38,16 @@ public class LeakExample extends Application {
         // UI
         VBox root = new VBox(view, commandTextField);
 
+        commandTextField.textProperty().addListener((observable, oldValue, newValue) -> {
+
+            if(newValue.equals("add")){
+                LeakingView view2 = new LeakingView(dataModel);
+                root.getChildren().add(view2);
+            }
+
+        });
+
+
         Scene scene = new Scene(root);
         new LeakScanner(scene, 100L, Algorithm.MAX);
 

@@ -2,6 +2,8 @@ package de.buildpath.leakscanner;
 
 import javafx.beans.value.ChangeListener;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -13,12 +15,14 @@ public class LeakingView extends VBox {
     private ChangeListener<String> carChangedListener;
     final static int HEIGHT =3;
     final static int WIDTH =1;
+    private ImageView imageView = new ImageView(new Image(getClass().getResourceAsStream("/relaxo.jpg")));
 
     private final Label carLabel = new Label();
 
     public LeakingView(Car car) {
         this.car = car;
-
+        imageView.setFitHeight(400);
+        imageView.setFitWidth(400);
         carLabel.textProperty().bind(car.name);
 
 
@@ -54,7 +58,7 @@ public class LeakingView extends VBox {
 
         car.name.addListener(carChangedListener);
 
-        getChildren().addAll(carLabel);
+        getChildren().addAll(carLabel,imageView);
         installHBox();
     }
 

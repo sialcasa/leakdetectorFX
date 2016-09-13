@@ -28,6 +28,7 @@ public class LeakDetectorMax extends LeakDetectorBase {
             new ReadOnlyListWrapper<>(FXCollections.observableArrayList());
 
     private final List<Object> listeners = new ArrayList<>();
+    private boolean buildTreeViewRunning=false;
 
     public ObservableSet<WeakRef<Node>> getRootParents() {
         return rootParents;
@@ -113,11 +114,16 @@ public class LeakDetectorMax extends LeakDetectorBase {
     }
 
     protected void buildTreeView() {
+
         // clear root treeItem and add current rootparents again
-        rootItem.getChildren().clear();
+//        if(!buildTreeViewRunning){
+//            rootItem.getChildren().clear();
+//        }
+
         List<TreeItem<WeakRef<Node>>> parentRootItems = new ArrayList<>();
-        ObservableSet<WeakRef<Node>> rootParentsa = FXCollections.observableSet(rootParents);
-        for (WeakRef<Node> rootParent : rootParentsa) {
+//        ObservableSet<WeakRef<Node>> rootParentsa = FXCollections.observableSet(rootParents);
+        buildTreeViewRunning=true;
+        for (WeakRef<Node> rootParent : rootParents) {
             if (rootParent.get() != null) {
                 WeakRef<Node> weakRefParent = rootParent;
                 TreeItem<WeakRef<Node>> parentRootItem = new TreeItem<>(weakRefParent);
@@ -133,12 +139,12 @@ public class LeakDetectorMax extends LeakDetectorBase {
 //                    rootItem.getChildren().add(parentRootItem);
                     parentRootItems.add(parentRootItem);
 
-//                    System.out.println("and i add it to the treeview");
 //                    System.out.println("root item child 0 " + rootItem.getChildren().get(0));
                 }
             }
         }
         rootItem.getChildren().addAll(parentRootItems);
+//        buildTreeViewRunning=false;
 
     }
 
