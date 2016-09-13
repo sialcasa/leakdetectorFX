@@ -13,7 +13,7 @@ import javafx.stage.Stage;
 public class LeakExample extends Application {
 
     // Long living model element
-    private final Car dataModel = new Car();
+    private final SomeDataModel dataModel = new SomeDataModel();
     
     // While the WeakReference contains the reference to the view, it's the
     // proof that the view retains in memory
