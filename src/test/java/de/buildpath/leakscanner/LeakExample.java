@@ -12,7 +12,7 @@ public class LeakExample extends Application {
 
     // Long living model element
     private final Car dataModel = new Car();
-
+    
     // While the WeakReference contains the reference to the view, it's the
     // proof that the view retains in memory
     @SuppressWarnings("unused")
@@ -24,19 +24,25 @@ public class LeakExample extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-
         // Create the leaking view and the WeakReference
         LeakingView view = new LeakingView(dataModel);
+        
         // While the WeakReference contains the reference to the view, it's the
         // proof that the view retains in memory
         weakReference = new WeakReference<LeakingView>(view);
 
         TextField commandTextField = new TextField();
         commandTextField.textProperty().bindBidirectional(dataModel.name);
-
+        
+        final VBox root = new VBox(commandTextField, view);
+        commandTextField.textProperty().addListener((c, o, n) -> {
+            if(n.equals("add")) {
+                LeakingView newView = new LeakingView(dataModel);
+                root.getChildren().add(newView);
+            }
+        });
+        
         // UI
-        VBox root = new VBox(view, commandTextField);
-
         Scene scene = new Scene(root);
         new LeakScanner(scene, 100L);
 

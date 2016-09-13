@@ -3,12 +3,17 @@ package de.buildpath.leakscanner;
 import java.util.Random;
 
 import javafx.application.Platform;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 
 public class Car {
 	// Normally you have setters / getters
 	public StringProperty name = new SimpleStringProperty("Audi");
+	public ImageView image;
 	
 	public void startRandomNameGeneration() {
 		Thread thread = new Thread(() -> {
