@@ -1,9 +1,11 @@
-package de.buildpath.leakscanner;
+package de.saxsys.leakscanner;
 
 import java.lang.ref.WeakReference;
 
+import de.saxsys.leakscanner.LeakScanner;
 import javafx.application.Application;
 import javafx.scene.Scene;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -34,11 +36,13 @@ public class LeakExample extends Application {
         TextField commandTextField = new TextField();
         commandTextField.textProperty().bindBidirectional(dataModel.name);
         
-        final VBox root = new VBox(commandTextField, view);
+        
+        final VBox vbox = new VBox(commandTextField, view);
+        final ScrollPane root = new ScrollPane(vbox);
         commandTextField.textProperty().addListener((c, o, n) -> {
             if(n.equals("add")) {
                 LeakingView newView = new LeakingView(dataModel);
-                root.getChildren().add(newView);
+                vbox.getChildren().add(newView);
             }
         });
         

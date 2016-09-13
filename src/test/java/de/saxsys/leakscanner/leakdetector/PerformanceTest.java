@@ -1,3 +1,4 @@
+package de.saxsys.leakscanner.leakdetector;
 //package de.buildpath.leakscanner.leakdetector;
 //
 //import de.buildpath.leakscanner.WeakRef;

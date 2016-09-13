@@ -1,10 +1,10 @@
-package de.buildpath.leakscanner.gui;
+package de.saxsys.leakscanner.gui;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-import de.buildpath.leakscanner.WeakRef;
+import de.saxsys.leakscanner.WeakRef;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;

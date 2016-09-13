@@ -1,4 +1,4 @@
-package de.buildpath.leakscanner;
+package de.saxsys.leakscanner;
 
 import javafx.beans.value.ChangeListener;
 import javafx.scene.image.Image;
@@ -10,7 +10,7 @@ public class LeakingView extends VBox {
 
     private final Car car;
     private ChangeListener<String> carChangedListener;
-    private ImageView imageView = new ImageView(new Image(getClass().getResourceAsStream("/relaxo.jpg")));
+    private ImageView imageView = new ImageView(new Image(getClass().getResourceAsStream("/pikatchu.jpg")));
     
     public LeakingView(Car car) {
         this.car = car;

@@ -1,4 +1,4 @@
-package de.buildpath.leakscanner;
+package de.saxsys.leakscanner;
 
 import java.util.function.Supplier;
 

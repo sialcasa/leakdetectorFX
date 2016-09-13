@@ -1,4 +1,4 @@
-package de.buildpath.leakscanner;
+package de.saxsys.leakscanner;
 
 import static org.junit.Assert.*;
 
@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import de.saxsys.javafx.test.JfxRunner;
+import de.saxsys.leakscanner.WeakRef;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 import javafx.scene.Node;

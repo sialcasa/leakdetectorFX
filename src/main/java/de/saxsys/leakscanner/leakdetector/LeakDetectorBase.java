@@ -1,9 +1,9 @@
-package de.buildpath.leakscanner.leakdetector;
+package de.saxsys.leakscanner.leakdetector;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import de.buildpath.leakscanner.WeakRef;
+import de.saxsys.leakscanner.WeakRef;
 import javafx.beans.value.WeakChangeListener;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;

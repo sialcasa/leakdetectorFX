@@ -1,4 +1,4 @@
-package de.buildpath.leakscanner.leakdetector;
+package de.saxsys.leakscanner.leakdetector;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -7,8 +7,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import de.buildpath.leakscanner.WeakRef;
 import de.saxsys.javafx.test.JfxRunner;
+import de.saxsys.leakscanner.WeakRef;
+import de.saxsys.leakscanner.leakdetector.LeakDetector;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;

@@ -1,7 +1,7 @@
-package de.buildpath.leakscanner;
+package de.saxsys.leakscanner;
 
-import de.buildpath.leakscanner.gui.LeakScannerStageFactory;
-import de.buildpath.leakscanner.leakdetector.LeakDetector;
+import de.saxsys.leakscanner.gui.LeakScannerStageFactory;
+import de.saxsys.leakscanner.leakdetector.LeakDetector;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.TreeItem;

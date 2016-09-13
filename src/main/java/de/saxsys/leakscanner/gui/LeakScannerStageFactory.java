@@ -1,6 +1,6 @@
-package de.buildpath.leakscanner.gui;
+package de.saxsys.leakscanner.gui;
 
-import de.buildpath.leakscanner.WeakRef;
+import de.saxsys.leakscanner.WeakRef;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.TreeItem;

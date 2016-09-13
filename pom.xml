@@ -24,7 +24,7 @@
     <artifactId>javafx-maven-plugin</artifactId>
     <version>8.7.0</version>
     <configuration>
-     <mainClass>de.buildpath.leakscanner.LeakExample</mainClass>
+     <mainClass>de.saxsys.leakscanner.LeakExample</mainClass>
     </configuration>
    </plugin>
   </plugins>
