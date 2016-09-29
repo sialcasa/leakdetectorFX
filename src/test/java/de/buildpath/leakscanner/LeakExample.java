@@ -45,6 +45,10 @@ public class LeakExample extends Application {
                 root.getChildren().add(view2);
             }
 
+            if(newValue.equals("undo")){
+                root.getChildren().add(view);
+            }
+
         });
 
 

@@ -57,7 +57,7 @@ public class LeakDetectorMax extends LeakDetectorBase {
             List<WeakRef<Node>> weakRefs = FXCollections.observableArrayList();
 
             rootParents.removeAll(weakRefs);
-
+            System.out.println(leakedObjects.size());
             if (leakedObjects.size() == 0) {
                 rootParents.clear();
                 System.out.println("cleared rootparents size " + rootParents.size());
@@ -70,9 +70,9 @@ public class LeakDetectorMax extends LeakDetectorBase {
     // get root Node of this element
 
     protected Set<WeakRef<Node>> getRootNodes() {
-        if(!getRootNodesRunning){
+//        if(!getRootNodesRunning){
             rootParents.clear();
-        }
+//        }
 
         List<WeakRef<Node>> weakRefsList = new ArrayList<>();
         getRootNodesRunning=true;
@@ -208,18 +208,20 @@ public class LeakDetectorMax extends LeakDetectorBase {
      * @param parent
      */
     protected void registerLeakDetection(Node parent) {
-        Optional<WeakRef<Node>> parentReference =
-                leakedObjects.stream().filter(element -> element.get() == parent).findFirst();
+
 
         // WeakRef is deklared outside the listener because otherwise it isn't weak
         WeakRef<Node> WeakRef = new WeakRef<Node>(parent);
         ChangeListener<Scene> sceneListener = (observable, oldValue, newValue) -> {
+            Optional<WeakRef<Node>> parentReference =
+                    leakedObjects.stream().filter(element -> element.get() == parent).findFirst();
             if (newValue == null) {
                 if (!parentReference.isPresent()) {
                     leakedObjects.add(WeakRef);
                 }
             } else {
-                leakedObjects.remove(parentReference);
+                leakedObjects.remove(parentReference.get());
+                System.out.println("weg mit pikachu");
             }
         };
 
