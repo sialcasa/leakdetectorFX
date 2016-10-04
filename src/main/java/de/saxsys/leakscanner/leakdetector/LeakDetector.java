@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import de.saxsys.leakscanner.LeakedItem;
 import de.saxsys.leakscanner.WeakRef;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
@@ -14,92 +15,85 @@ import javafx.collections.ObservableMap;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.TreeItem;
-
 
 public class LeakDetector extends LeakDetectorBase {
-    protected final ObservableMap<WeakRef<Node>, TreeItem<WeakRef<Node>>> map = FXCollections.observableHashMap();
+    protected final ObservableMap<WeakRef<Node>, LeakedItem> map = FXCollections.observableHashMap();
 
-    public LeakDetector(Scene... scenes) {
-        registerListenerOnSceneRoot(scenes[0]);
+    public LeakDetector(Scene scene) {
+        registerListenerOnSceneRoot(scene);
+        rootItem = new LeakedItem(new WeakRef<Node>(scene.getRoot()));
 
-        map.addListener(((MapChangeListener<WeakRef<Node>, TreeItem<WeakRef<Node>>>) c -> {
-          if (c.wasAdded()) {
-              // add TreeItem to root if the node has no parent (else append to TreeItem of parent) 
-              if(getParent(c.getKey()) == null) {
-                  appendTreeItemToRoot(c.getValueAdded());
-              } else {
-                  addParentOfNode(c.getKey(), c.getValueAdded());
-              }
-          }
-          
-          if(c.wasRemoved()) {
-              // remove also TreeItem if node was removed from map
-              Platform.runLater(() -> {
-                  rootItem.getChildren().remove(c.getValueRemoved());
-              }); 
-          }
+        map.addListener(((MapChangeListener<WeakRef<Node>, LeakedItem>) c -> {
+            if (c.wasAdded()) {
+                // add to root if the node has no parent (else append to parent)
+                if (getParent(c.getKey()) == null) {
+                    appendToRoot(c.getValueAdded());
+                } else {
+                    addParentOfNode(c.getKey(), c.getValueAdded());
+                }
+            }
+
+            if (c.wasRemoved()) {
+                // remove also from LeakedItem hierarchy if node was removed from map
+                Platform.runLater(() -> {
+                    rootItem.getChildren().remove(c.getValueRemoved());
+                });
+            }
         }));
     }
-    
-    
+
     /**
-     * The given treeItemChild will be added the the children of the root treeItem.
+     * The given LeakedItem will be added as a children of the root LeakedItem.
      *
-     * @param treeItemChild
+     * @param leakedItemChild
      */
-    protected void appendTreeItemToRoot(TreeItem<WeakRef<Node>> treeItemChild) {
-        rootItem.getChildren().add(treeItemChild);
+    protected void appendToRoot(LeakedItem leakedItemChild) {
+        rootItem.getChildren().add(leakedItemChild);
     }
 
-    
     /**
-     * If node has a parent the parent will be added to the map and the parent treeItem gets 
-     * treeItemChild as a child.
+     * If node has a parent it will be added to the map and the parent LeakedItem gets the node as a child.
      *
      * @param node
-     * @param treeItemChild
+     * @param leakedItemChild
      */
-    protected void addParentOfNode(WeakRef<Node> node, TreeItem<WeakRef<Node>> treeItemChild) {
+    protected void addParentOfNode(WeakRef<Node> node, LeakedItem leakedItemChild) {
         Parent p = getParent(node);
-        if(p != null) {
+        if (p != null) {
             // has Parent
-            TreeItem<WeakRef<Node>> treeItemParent = getTreeItemFromMap(new WeakRef<Node>(p));
-            if(treeItemParent == null) {
-                // parent not in map, create TreeItem
-                treeItemParent = insertIntoMap(p);
+            LeakedItem leakedItemParent = getLeakedItemFromMap(new WeakRef<Node>(p));
+            if (leakedItemParent == null) {
+                // parent not in map, create LeakedItem
+                leakedItemParent = insertIntoMap(p);
             }
             // add child
-            treeItemParent.getChildren().add(treeItemChild);
+            leakedItemParent.getChildren().add(leakedItemChild);
         }
     }
-    
-    
+
     /**
      * Adds the node (given as a WeakRef) to the map.
      *
      * @param weakRef
-     * @return TreeItem from this node
+     * @return LeakedItem from this node
      */
-    protected TreeItem<WeakRef<Node>> insertWeakRefIntoMap(WeakRef<Node> weakRef) {
-        TreeItem<WeakRef<Node>> child = new TreeItem<WeakRef<Node>>(weakRef);
+    protected LeakedItem insertWeakRefIntoMap(WeakRef<Node> weakRef) {
+        LeakedItem child = new LeakedItem(weakRef);
         map.put(weakRef, child);
-        
+
         return child;
     }
-    
-    
+
     /**
      * Covers the node into a WeakRef and adds it to the map.
      *
      * @param node
-     * @return TreeItem from this node
+     * @return LeakedItem from this node
      */
-    protected TreeItem<WeakRef<Node>> insertIntoMap(Node node) {
+    protected LeakedItem insertIntoMap(Node node) {
         return insertWeakRefIntoMap(new WeakRef<Node>(node));
     }
 
-    
     /**
      * Returns the parent of node.
      *
@@ -110,41 +104,37 @@ public class LeakDetector extends LeakDetectorBase {
         return node.get().getParent();
     }
 
-
     /**
-     * Returns the treeItem of the given node.
+     * Returns the LeakedItem of the given node.
      *
      * @param node
      * @return Parent of node
      */
-    protected TreeItem<WeakRef<Node>> getTreeItemFromMap(WeakRef<Node> node) {
-        TreeItem<WeakRef<Node>> treeItem = map.get(node);
+    protected LeakedItem getLeakedItemFromMap(WeakRef<Node> node) {
+        LeakedItem treeItem = map.get(node);
         return treeItem;
     }
 
-    
     /**
-     * Check the scene property of a parent for getting null. If it gets null
-     * and the Object retains in Memory (leakedObject List), it is likely a
-     * leak.
+     * Check the scene property of a parent for getting null. If it gets null and the Object retains in Memory
+     * (leakedObject List), it is likely a leak.
      *
      * @param parent
      */
     protected void registerLeakDetection(Node parent) {
-        Optional<WeakRef<Node>> parentReference = map.keySet().stream()
-                .filter(element -> element.get() == parent)
-                .findFirst();
-        
+        Optional<WeakRef<Node>> parentReference =
+                map.keySet().stream().filter(element -> element.get() == parent).findFirst();
+
         WeakRef<Node> weakRef = new WeakRef<Node>(parent);
         ChangeListener<Scene> sceneListener = (observable, oldValue, newValue) -> {
             if (newValue == null) {
                 if (!parentReference.isPresent()) {
-                    if(map.get(weakRef) == null) {
+                    if (map.get(weakRef) == null) {
                         insertWeakRefIntoMap(weakRef);
                     }
                 }
             } else {
-                if(parentReference.isPresent()) {
+                if (parentReference.isPresent()) {
                     map.remove(parentReference.get());
                 }
             }
@@ -154,31 +144,27 @@ public class LeakDetector extends LeakDetectorBase {
         parent.sceneProperty().addListener(new WeakChangeListener<>(sceneListener));
     }
 
-    
     /**
-     * We check whether a WeakRef got cleared and remove it if yes. In
-     * addition we continue the GC.
+     * We check whether a WeakRef got cleared and remove it if yes. In addition we continue the GC.
      *
      * @return whether the GC penetration should get continued
      */
     public boolean checkLeaksAndContinueGC() {
         synchronized (this) {
-            List<WeakRef<Node>> collect = map.keySet().stream()
-                    .filter(ref -> (ref.get() == null))
-                    .collect(Collectors.toList());
-            
+            List<WeakRef<Node>> collect =
+                    map.keySet().stream().filter(ref -> (ref.get() == null)).collect(Collectors.toList());
+
             map.keySet().removeAll(collect);
         }
         // Continue GC
         return true;
     }
 
-    
     /*
      * GETTER SETTER
      */
 
-    public final ObservableMap<WeakRef<Node>, TreeItem<WeakRef<Node>>> getLeakedObjects() {
+    public final ObservableMap<WeakRef<Node>, LeakedItem> getLeakedObjects() {
         return map;
     }
 }

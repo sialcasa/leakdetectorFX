@@ -1,14 +1,12 @@
 package de.saxsys.leakscanner.gui;
 
-import de.saxsys.leakscanner.WeakRef;
-import javafx.scene.Node;
+import de.saxsys.leakscanner.leakdetector.LeakDetector;
 import javafx.scene.Scene;
-import javafx.scene.control.TreeItem;
 import javafx.stage.Stage;
 
 public class LeakScannerStageFactory {   
     static Stage stage = new Stage();
-    public static void showLeakedObjects(TreeItem<WeakRef<Node>> root) {
+    public static void showLeakedObjects(LeakDetector root) {
         stage.setTitle("Potentially Leaked Nodes");
 
         LeakScannerView leakScannerView = new LeakScannerView(root);     

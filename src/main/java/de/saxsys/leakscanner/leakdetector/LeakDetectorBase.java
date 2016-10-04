@@ -3,6 +3,7 @@ package de.saxsys.leakscanner.leakdetector;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.saxsys.leakscanner.LeakedItem;
 import de.saxsys.leakscanner.WeakRef;
 import javafx.beans.value.WeakChangeListener;
 import javafx.collections.ListChangeListener;
@@ -16,7 +17,7 @@ import javafx.scene.control.TreeItem;
 public abstract class LeakDetectorBase {
     
     protected final List<Object> listeners = new ArrayList<>();
-    protected TreeItem<WeakRef<Node>> rootItem = new TreeItem<WeakRef<Node>>();
+    protected LeakedItem rootItem;
     
         
     protected abstract void registerLeakDetection(Node parent);
@@ -90,7 +91,7 @@ public abstract class LeakDetectorBase {
     /*
      * GETTER SETTER
      */
-    public TreeItem<WeakRef<Node>> getRootItem() {
+    public LeakedItem getRootItem() {
         return rootItem;
     }
 }

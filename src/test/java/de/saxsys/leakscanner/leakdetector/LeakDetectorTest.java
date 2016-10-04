@@ -8,13 +8,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import de.saxsys.javafx.test.JfxRunner;
+import de.saxsys.leakscanner.LeakedItem;
 import de.saxsys.leakscanner.WeakRef;
-import de.saxsys.leakscanner.leakdetector.LeakDetector;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
-import javafx.scene.control.TreeItem;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
@@ -46,25 +45,25 @@ public class LeakDetectorTest {
         Label label = new Label("Label");
         WeakRef<Node> labelRef = new WeakRef<Node>(label);
         
-        TreeItem<WeakRef<Node>> returned = leakDetector.insertWeakRefIntoMap(labelRef);
-        assertEquals(labelRef, returned.getValue());
+        LeakedItem returned = leakDetector.insertWeakRefIntoMap(labelRef);
+        assertEquals(labelRef, returned.getNode());
         
     }
     
     
     /**
-     * Tests the getTreeItemFromMap()
+     * Tests the getLeakedItemFromMap()
      * 
      */
     @Test
-    public void getTreeItemFromMapTest() {
+    public void getLeakedItemFromMapTest() {
         Label label = new Label("Label");
         WeakRef<Node> labelRef = new WeakRef<Node>(label);
         
-        TreeItem<WeakRef<Node>> child = new TreeItem<WeakRef<Node>>(labelRef);
-        leakDetector.map.put(labelRef, child);
+        LeakedItem child = new LeakedItem(labelRef);
+        leakDetector.getLeakedObjects().put(labelRef, child);
         
-        TreeItem<WeakRef<Node>> treeItemhBox = leakDetector.getTreeItemFromMap(new WeakRef<Node>(label));
+        LeakedItem treeItemhBox = leakDetector.getLeakedItemFromMap(new WeakRef<Node>(label));
         assertEquals(child, treeItemhBox);
     }
     
@@ -76,13 +75,13 @@ public class LeakDetectorTest {
     @Test
     public void insertIntoMapTest() {
         Label label = new Label("New Node");
-        TreeItem<WeakRef<Node>> labelItem = leakDetector.insertIntoMap(label);
+        LeakedItem labelItem = leakDetector.insertIntoMap(label);
         
         if(labelItem == null) {
             fail("Returned node is null");
         }
                 
-        assertEquals(label, labelItem.getValue().get());
+        assertEquals(label, labelItem.getNode().get());
     }
     
     
@@ -129,9 +128,9 @@ public class LeakDetectorTest {
         HBox hbox = new HBox(label);
         WeakRef<Node> labelRef = new WeakRef<Node>(label);
 
-        leakDetector.addParentOfNode(labelRef, new TreeItem<WeakRef<Node>>(labelRef));
-        TreeItem<WeakRef<Node>> hboxTI = leakDetector.getLeakedObjects().get(new WeakRef<Node>(hbox)); 
-        assertEquals(hbox, hboxTI.getValue().get());
+        leakDetector.addParentOfNode(labelRef, new LeakedItem(labelRef));
+        LeakedItem hboxTI = leakDetector.getLeakedObjects().get(new WeakRef<Node>(hbox)); 
+        assertEquals(hbox, hboxTI.getNode().get());
     }
     
 
@@ -142,7 +141,7 @@ public class LeakDetectorTest {
     @Test
     public void leakDetectorTest(){
         // in our init method we created a scene with some elements
-        // now we delete them from the scene graph and we'll get a leak
+        // now we delete them from the scene graph and we'll get leaked suspicious nodes
         root.getChildren().clear();
         leakDetector.getLeakedObjects().keySet().stream().forEach(e -> { System.out.println(e.get()); });
     }

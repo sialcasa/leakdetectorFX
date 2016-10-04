@@ -2,9 +2,7 @@ package de.saxsys.leakscanner;
 
 import de.saxsys.leakscanner.gui.LeakScannerStageFactory;
 import de.saxsys.leakscanner.leakdetector.LeakDetector;
-import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.TreeItem;
 
 public class LeakScanner {
     LeakDetector leakDetector;
@@ -12,8 +10,8 @@ public class LeakScanner {
     public LeakScanner(Scene observableScene, long garbageCollectionIntervalMillis) {
         leakDetector = new LeakDetector(observableScene);
         
-        TreeItem<WeakRef<Node>> root = leakDetector.getRootItem();
-        LeakScannerStageFactory.showLeakedObjects(root);
+        
+        LeakScannerStageFactory.showLeakedObjects(leakDetector);
         GCActivity.startGCActivity(leakDetector::checkLeaksAndContinueGC, garbageCollectionIntervalMillis);
     }
 
