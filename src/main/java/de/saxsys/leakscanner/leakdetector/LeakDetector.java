@@ -6,11 +6,11 @@ import java.util.stream.Collectors;
 
 import de.saxsys.leakscanner.LeakedItem;
 import de.saxsys.leakscanner.WeakRef;
-import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.WeakChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.MapChangeListener;
+import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -18,6 +18,7 @@ import javafx.scene.Scene;
 
 public class LeakDetector extends LeakDetectorBase {
     protected final ObservableMap<WeakRef<Node>, LeakedItem> map = FXCollections.observableHashMap();
+    protected final ObservableList<WeakRef<Node>> whiteList = FXCollections.observableArrayList();
 
     public LeakDetector(Scene scene) {
         registerListenerOnSceneRoot(scene);
@@ -35,11 +36,35 @@ public class LeakDetector extends LeakDetectorBase {
 
             if (c.wasRemoved()) {
                 // remove also from LeakedItem hierarchy if node was removed from map
-                Platform.runLater(() -> {
-                    rootItem.getChildren().remove(c.getValueRemoved());
-                });
+                removeFromLeakedItemHierarchy(c.getValueRemoved());
             }
         }));
+    }
+
+    protected boolean nodeOnWhitelist(WeakRef<Node> ref) {
+        if (whiteList.contains(ref)) {
+            return true;
+        } else {
+            return parentOnWhiteList(ref);
+        }
+    }
+
+    protected boolean parentOnWhiteList(WeakRef<Node> ref) {
+        Parent parent = getParent(ref);
+        if (parent == null) {
+            return false;
+        } else {
+            return nodeOnWhitelist(new WeakRef<Node>(parent));
+        }
+    }
+
+    /**
+     * The given LeakedItem will be removed from the parent's children list.
+     *
+     * @param removedLeakedItem
+     */
+    protected void removeFromLeakedItemHierarchy(LeakedItem removedLeakedItem) {
+        removedLeakedItem.getParent().getChildren().remove(removedLeakedItem);
     }
 
     /**
@@ -72,14 +97,17 @@ public class LeakDetector extends LeakDetectorBase {
     }
 
     /**
-     * Adds the node (given as a WeakRef) to the map.
+     * Adds the node (given as a WeakRef) to the map with the whitelist in mind.
      *
      * @param weakRef
      * @return LeakedItem from this node
      */
     protected LeakedItem insertWeakRefIntoMap(WeakRef<Node> weakRef) {
         LeakedItem child = new LeakedItem(weakRef);
-        map.put(weakRef, child);
+        // add only if weakRef and all of its parents are not on whitelist
+        if (!nodeOnWhitelist(weakRef)) {
+            map.put(weakRef, child);
+        }
 
         return child;
     }
@@ -116,17 +144,28 @@ public class LeakDetector extends LeakDetectorBase {
     }
 
     /**
+     * Add node to whitelist (will not be displayed in TableTreeView).
+     *
+     * @param node
+     */
+    public void addToWhiteList(LeakedItem node) {
+        whiteList.add(node.getNode());
+        map.remove(node.getNode());
+
+    }
+
+    /**
      * Check the scene property of a parent for getting null. If it gets null and the Object retains in Memory
      * (leakedObject List), it is likely a leak.
      *
      * @param parent
      */
     protected void registerLeakDetection(Node parent) {
-        Optional<WeakRef<Node>> parentReference =
-                map.keySet().stream().filter(element -> element.get() == parent).findFirst();
-
         WeakRef<Node> weakRef = new WeakRef<Node>(parent);
         ChangeListener<Scene> sceneListener = (observable, oldValue, newValue) -> {
+            Optional<WeakRef<Node>> parentReference =
+                    map.keySet().stream().filter(element -> element.get() == parent).findFirst();
+
             if (newValue == null) {
                 if (!parentReference.isPresent()) {
                     if (map.get(weakRef) == null) {
@@ -166,5 +205,9 @@ public class LeakDetector extends LeakDetectorBase {
 
     public final ObservableMap<WeakRef<Node>, LeakedItem> getLeakedObjects() {
         return map;
+    }
+
+    public ObservableList<WeakRef<Node>> getWhiteList() {
+        return whiteList;
     }
 }

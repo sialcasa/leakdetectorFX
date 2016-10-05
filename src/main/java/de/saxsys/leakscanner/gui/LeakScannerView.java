@@ -13,6 +13,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableColumn;
@@ -57,6 +59,19 @@ public class LeakScannerView extends BorderPane implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        MenuItem m = new MenuItem();
+        m.setText("Add to whitelist");
+        m.setOnAction(event -> {
+            TreeItem<LeakedItem> selectedItem = leakTreeTableView.getSelectionModel().getSelectedItem();
+            // add to whitelist for persistence
+            leakDetector.addToWhiteList(selectedItem.getValue());
+        });
+        
+        ContextMenu rootContextMenu = new ContextMenu();
+        rootContextMenu.getItems().add(m);
+        
+        leakTreeTableView.setContextMenu(rootContextMenu);
+        
         nodeCol.setCellValueFactory(w -> {
             LeakedItem item = w.getValue().getValue();
 

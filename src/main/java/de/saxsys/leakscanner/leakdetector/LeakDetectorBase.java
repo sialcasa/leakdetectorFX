@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.saxsys.leakscanner.LeakedItem;
-import de.saxsys.leakscanner.WeakRef;
 import javafx.beans.value.WeakChangeListener;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -12,7 +11,6 @@ import javafx.collections.WeakListChangeListener;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.TreeItem;
 
 public abstract class LeakDetectorBase {
     
