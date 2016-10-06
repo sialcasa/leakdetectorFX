@@ -1,9 +1,5 @@
 package de.saxsys.leakscanner.gui;
 
-import java.io.IOException;
-import java.net.URL;
-import java.util.ResourceBundle;
-
 import de.saxsys.leakscanner.LeakedItem;
 import de.saxsys.leakscanner.WeakRef;
 import de.saxsys.leakscanner.leakdetector.LeakDetector;
@@ -13,13 +9,12 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeTableColumn;
-import javafx.scene.control.TreeTableView;
+import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
+
+import java.io.IOException;
+import java.net.URL;
+import java.util.ResourceBundle;
 
 public class LeakScannerView extends BorderPane implements Initializable {
 
@@ -34,6 +29,9 @@ public class LeakScannerView extends BorderPane implements Initializable {
 
     @FXML
     private TreeTableColumn<LeakedItem, Number> hashCodeCol;
+
+    @FXML
+    private ListView<WeakRef<Node>> whiteListView;
 
     final LeakDetector leakDetector;
 
@@ -83,6 +81,21 @@ public class LeakScannerView extends BorderPane implements Initializable {
 
             return item.hashCodeProperty();
         });
+
+        //whiteList
+        whiteListView.setItems(leakDetector.getWhiteList());
+
+        MenuItem whiteListMenuItem = new MenuItem();
+        whiteListMenuItem.setText("remove from whitelist");
+        whiteListMenuItem.setOnAction(event -> {
+            WeakRef<Node> selectedItem = whiteListView.getSelectionModel().getSelectedItem();
+            // remove from whiteList
+            leakDetector.removeFromWhiteList(selectedItem);
+        });
+
+        ContextMenu whiteListContextMenu = new ContextMenu();
+        whiteListContextMenu.getItems().add(whiteListMenuItem);
+        whiteListView.setContextMenu(whiteListContextMenu);
     }
 
     @FXML

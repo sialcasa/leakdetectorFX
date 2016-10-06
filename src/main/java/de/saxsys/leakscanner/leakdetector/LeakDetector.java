@@ -1,9 +1,5 @@
 package de.saxsys.leakscanner.leakdetector;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
 import de.saxsys.leakscanner.LeakedItem;
 import de.saxsys.leakscanner.WeakRef;
 import javafx.beans.value.ChangeListener;
@@ -15,6 +11,10 @@ import javafx.collections.ObservableMap;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class LeakDetector extends LeakDetectorBase {
     protected final ObservableMap<WeakRef<Node>, LeakedItem> map = FXCollections.observableHashMap();
@@ -209,5 +209,10 @@ public class LeakDetector extends LeakDetectorBase {
 
     public ObservableList<WeakRef<Node>> getWhiteList() {
         return whiteList;
+    }
+
+    public void removeFromWhiteList(WeakRef<Node> item) {
+        whiteList.remove(item);
+        insertWeakRefIntoMap(item);
     }
 }
