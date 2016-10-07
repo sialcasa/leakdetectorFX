@@ -7,6 +7,7 @@ import java.util.ResourceBundle;
 import de.saxsys.leakscanner.LeakedItem;
 import de.saxsys.leakscanner.WeakRef;
 import de.saxsys.leakscanner.leakdetector.LeakDetector;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.MapChangeListener;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -14,6 +15,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
@@ -34,6 +36,9 @@ public class LeakScannerView extends BorderPane implements Initializable {
 
     @FXML
     private TreeTableColumn<LeakedItem, Number> hashCodeCol;
+    
+    @FXML
+    private TreeTableColumn<LeakedItem, String> oldParentCol;
 
     final LeakDetector leakDetector;
 
@@ -51,8 +56,8 @@ public class LeakScannerView extends BorderPane implements Initializable {
         leakDetector.getLeakedObjects().addListener((MapChangeListener<WeakRef<Node>, LeakedItem>) change -> {
             buildTree();
         });
-
-        TreeItem<LeakedItem> rootItem = new TreeItem<LeakedItem>(leakDetector.getRootItem());
+        
+        TreeItem<LeakedItem> rootItem = new TreeItem<LeakedItem>(new LeakedItem(new WeakRef<Node>(new Label("Scene"))));
         rootItem.setExpanded(true);
         leakTreeTableView.setRoot(rootItem);
     }
@@ -73,15 +78,25 @@ public class LeakScannerView extends BorderPane implements Initializable {
         leakTreeTableView.setContextMenu(rootContextMenu);
         
         nodeCol.setCellValueFactory(w -> {
-            LeakedItem item = w.getValue().getValue();
+            if(leakTreeTableView.getRoot() == w.getValue()) {
+                    return new SimpleStringProperty("Scene");
+            } else {
+                LeakedItem item = w.getValue().getValue();
 
-            return item.nodeProperty();
+                return item.nodeProperty();
+            }
         });
 
         hashCodeCol.setCellValueFactory(w -> {
             LeakedItem item = w.getValue().getValue();
 
             return item.hashCodeProperty();
+        });
+        
+        oldParentCol.setCellValueFactory(w -> {
+            LeakedItem item = w.getValue().getValue();
+
+            return item.oldParentProperty();
         });
     }
 

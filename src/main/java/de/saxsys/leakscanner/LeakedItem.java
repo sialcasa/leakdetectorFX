@@ -8,11 +8,13 @@ import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 
 public class LeakedItem {
     private WeakRef<Node> node;
     private ObservableList<LeakedItem> children = FXCollections.observableArrayList();
     private LeakedItem parent = null;
+    private Parent oldSceneParent; 
 
     public LeakedItem(WeakRef<Node> node) {
         this.node = node;
@@ -41,6 +43,14 @@ public class LeakedItem {
     public void setParent(LeakedItem parent) {
         this.parent = parent;
     }
+    
+    public Parent getOldSceneParent() {
+        return oldSceneParent;
+    }
+
+    public void setOldSceneParent(Parent oldSceneParent) {
+        this.oldSceneParent = oldSceneParent;
+    }
 
     public StringProperty nodeProperty() {
         if (node.get() == null) {
@@ -55,6 +65,14 @@ public class LeakedItem {
             return null;
         } else {
             return new SimpleIntegerProperty(node.get().hashCode());
+        }
+    }
+    
+    public StringProperty oldParentProperty() {
+        if (oldSceneParent == null) {
+            return null;
+        } else {
+            return new SimpleStringProperty(getOldSceneParent().toString());
         }
     }
 }

@@ -16,7 +16,6 @@ public abstract class LeakDetectorBase {
     
     protected final List<Object> listeners = new ArrayList<>();
     protected LeakedItem rootItem;
-    
         
     protected abstract void registerLeakDetection(Node parent);
     public abstract boolean checkLeaksAndContinueGC();

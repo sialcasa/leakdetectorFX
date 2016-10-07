@@ -19,6 +19,7 @@ import javafx.scene.Scene;
 public class LeakDetector extends LeakDetectorBase {
     protected final ObservableMap<WeakRef<Node>, LeakedItem> map = FXCollections.observableHashMap();
     protected final ObservableList<WeakRef<Node>> whiteList = FXCollections.observableArrayList();
+    protected final ObservableMap<WeakRef<Node>, Parent> oldParentHistory = FXCollections.observableHashMap();
 
     public LeakDetector(Scene scene) {
         registerListenerOnSceneRoot(scene);
@@ -41,6 +42,11 @@ public class LeakDetector extends LeakDetectorBase {
         }));
     }
 
+    /**
+     * Checks for the given node if it and its parents are on whitelist.
+     *
+     * @param ref
+     */
     protected boolean nodeOnWhitelist(WeakRef<Node> ref) {
         if (whiteList.contains(ref)) {
             return true;
@@ -106,6 +112,7 @@ public class LeakDetector extends LeakDetectorBase {
         LeakedItem child = new LeakedItem(weakRef);
         // add only if weakRef and all of its parents are not on whitelist
         if (!nodeOnWhitelist(weakRef)) {
+            child.setOldSceneParent(oldParentHistory.get(weakRef));
             map.put(weakRef, child);
         }
 
@@ -173,14 +180,20 @@ public class LeakDetector extends LeakDetectorBase {
                     }
                 }
             } else {
+                updateParent(parent);
                 if (parentReference.isPresent()) {
                     map.remove(parentReference.get());
                 }
             }
         };
+        updateParent(parent);
 
         listeners.add(sceneListener);
         parent.sceneProperty().addListener(new WeakChangeListener<>(sceneListener));
+    }
+
+    private void updateParent(Node parent) {
+        oldParentHistory.put(new WeakRef<Node>(parent), parent.getParent());
     }
 
     /**
