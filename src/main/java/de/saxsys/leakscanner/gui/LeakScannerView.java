@@ -16,6 +16,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
@@ -36,9 +37,12 @@ public class LeakScannerView extends BorderPane implements Initializable {
 
     @FXML
     private TreeTableColumn<LeakedItem, Number> hashCodeCol;
-    
+
     @FXML
     private TreeTableColumn<LeakedItem, String> oldParentCol;
+
+    @FXML
+    private ListView<WeakRef<Node>> whiteListView;
 
     final LeakDetector leakDetector;
 
@@ -56,7 +60,7 @@ public class LeakScannerView extends BorderPane implements Initializable {
         leakDetector.getLeakedObjects().addListener((MapChangeListener<WeakRef<Node>, LeakedItem>) change -> {
             buildTree();
         });
-        
+
         TreeItem<LeakedItem> rootItem = new TreeItem<LeakedItem>(new LeakedItem(new WeakRef<Node>(new Label("Scene"))));
         rootItem.setExpanded(true);
         leakTreeTableView.setRoot(rootItem);
@@ -71,15 +75,15 @@ public class LeakScannerView extends BorderPane implements Initializable {
             // add to whitelist for persistence
             leakDetector.addToWhiteList(selectedItem.getValue());
         });
-        
+
         ContextMenu rootContextMenu = new ContextMenu();
         rootContextMenu.getItems().add(m);
-        
+
         leakTreeTableView.setContextMenu(rootContextMenu);
-        
+
         nodeCol.setCellValueFactory(w -> {
-            if(leakTreeTableView.getRoot() == w.getValue()) {
-                    return new SimpleStringProperty("Scene");
+            if (leakTreeTableView.getRoot() == w.getValue()) {
+                return new SimpleStringProperty("Scene");
             } else {
                 LeakedItem item = w.getValue().getValue();
 
@@ -92,12 +96,15 @@ public class LeakScannerView extends BorderPane implements Initializable {
 
             return item.hashCodeProperty();
         });
-        
+
         oldParentCol.setCellValueFactory(w -> {
             LeakedItem item = w.getValue().getValue();
 
             return item.oldParentProperty();
         });
+
+        whiteListView.setItems(leakDetector.getWhiteList());
+        addContextMenuWhitelist();
     }
 
     @FXML
@@ -120,5 +127,20 @@ public class LeakScannerView extends BorderPane implements Initializable {
         for (LeakedItem childLeak : leak.getChildren()) {
             createTreeItemForLeakedItem(childLeak, treeItemParent);
         }
+    }
+
+    private void addContextMenuWhitelist() {
+        MenuItem whiteListMenuItem = new MenuItem();
+        whiteListMenuItem.setText("remove from whitelist");
+        whiteListMenuItem.setOnAction(event -> {
+            WeakRef<Node> selectedItem = whiteListView.getSelectionModel().getSelectedItem();
+            // remove from whiteList
+            leakDetector.removeFromWhiteList(selectedItem);
+        });
+
+        ContextMenu whiteListContextMenu = new ContextMenu();
+        whiteListContextMenu.getItems().add(whiteListMenuItem);
+
+        whiteListView.setContextMenu(whiteListContextMenu);
     }
 }

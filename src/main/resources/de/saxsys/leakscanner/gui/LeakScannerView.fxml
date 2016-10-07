@@ -1,48 +1,75 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
-<?import java.lang.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.control.TreeTableColumn?>
+<?import javafx.scene.control.TreeTableView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
 
-<fx:root maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" type="BorderPane" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
-   <top>
-      <MenuBar BorderPane.alignment="CENTER">
-        <menus>
-          <Menu mnemonicParsing="false" text="File">
-            <items>
-              <MenuItem mnemonicParsing="false" text="Close" />
-            </items>
-          </Menu>
-          <Menu mnemonicParsing="false" text="Edit">
-            <items>
-              <MenuItem mnemonicParsing="false" text="Delete" />
-            </items>
-          </Menu>
-          <Menu mnemonicParsing="false" text="Help">
-            <items>
-              <MenuItem mnemonicParsing="false" text="About" />
-            </items>
-          </Menu>
-        </menus>
-      </MenuBar>
-   </top>
-   <center>
-      <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER">
-         <children>
-            <ToolBar prefHeight="40.0" prefWidth="200.0">
-              <items>
-                <Button mnemonicParsing="false" onAction="#onGcButtonPressed" text="GC" />
-                  <TextField fx:id="filterTextField" promptText="Filter for class" />
-              </items>
-            </ToolBar>
-            <TreeTableView fx:id="leakTreeTableView" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS">
-              <columns>
-                <TreeTableColumn fx:id="nodeCol" prefWidth="435.0" text="Node" />
-                <TreeTableColumn fx:id="hashCodeCol" prefWidth="164.0" text="Hashcode" />
-              </columns>
-            </TreeTableView>
-         </children>
-      </VBox>
-   </center>
+<fx:root maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" stylesheets="@leakScanner.css" type="BorderPane" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
+    <top>
+        <MenuBar BorderPane.alignment="CENTER">
+            <menus>
+                <Menu mnemonicParsing="false" text="File">
+                    <items>
+                        <MenuItem mnemonicParsing="false" text="Close" />
+                    </items>
+                </Menu>
+                <Menu mnemonicParsing="false" text="Edit">
+                    <items>
+                        <MenuItem mnemonicParsing="false" text="Delete" />
+                    </items>
+                </Menu>
+                <Menu mnemonicParsing="false" text="Help">
+                    <items>
+                        <MenuItem mnemonicParsing="false" text="About" />
+                    </items>
+                </Menu>
+            </menus>
+        </MenuBar>
+    </top>
+    <center>
+        <TabPane>
+            <tabs>
+                <Tab text="Leaks">
+                    <content>
+                        <VBox>
+                            <children>
+                                <ToolBar prefHeight="40.0" prefWidth="200.0">
+                                    <items>
+                                        <Button mnemonicParsing="false" onAction="#onGcButtonPressed" text="GC" />
+                                        <TextField fx:id="filterTextField" promptText="Filter for class" />
+                                    </items>
+                                </ToolBar>
+                                <TreeTableView fx:id="leakTreeTableView" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+                                    <columns>
+                                        <TreeTableColumn fx:id="nodeCol" prefWidth="425.0" text="Node" />
+                                        <TreeTableColumn fx:id="oldParentCol" prefWidth="140.0" text="Parent" />
+                                        <TreeTableColumn fx:id="hashCodeCol" prefWidth="100.0" text="Hashcode" />
+                                    </columns>
+                                </TreeTableView>
+                            </children>
+                        </VBox>
+                    </content>
+                </Tab>
+                <Tab text="Whitelist">
+                    <content>
+                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <ListView fx:id="whiteListView" layoutX="156.0" layoutY="120.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                     </children></AnchorPane>
+                    </content>
+                </Tab>
+            </tabs>
+        </TabPane>
+    </center>
 </fx:root>
