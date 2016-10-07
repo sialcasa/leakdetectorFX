@@ -43,7 +43,7 @@ public class LeakExample extends Application {
                 vbox.getChildren().add(newView);
             }
             if (n.equals("init")) {
-                vbox.getChildren().add(view);
+                vbox.getChildren().add(weakReference.get());
             }
         });
 

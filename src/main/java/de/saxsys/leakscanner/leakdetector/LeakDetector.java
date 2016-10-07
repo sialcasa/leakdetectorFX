@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 public class LeakDetector extends LeakDetectorBase {
     protected final ObservableMap<WeakRef<Node>, LeakedItem> map = FXCollections.observableHashMap();
     protected final ObservableList<WeakRef<Node>> whiteList = FXCollections.observableArrayList();
-    protected final ObservableMap<WeakRef<Node>, Parent> oldParentHistory = FXCollections.observableHashMap();
+    protected final ObservableMap<WeakRef<Node>, WeakRef<Parent>> oldParentHistory = FXCollections.observableHashMap();
 
     public LeakDetector(Scene scene) {
         registerListenerOnSceneRoot(scene);
@@ -168,11 +168,11 @@ public class LeakDetector extends LeakDetectorBase {
      * @param parent
      */
     protected void registerLeakDetection(Node parent) {
+        Optional<WeakRef<Node>> parentReference =
+                map.keySet().stream().filter(element -> element.get() == parent).findFirst();
+
         WeakRef<Node> weakRef = new WeakRef<Node>(parent);
         ChangeListener<Scene> sceneListener = (observable, oldValue, newValue) -> {
-            Optional<WeakRef<Node>> parentReference =
-                    map.keySet().stream().filter(element -> element.get() == parent).findFirst();
-
             if (newValue == null) {
                 if (!parentReference.isPresent()) {
                     if (map.get(weakRef) == null) {
@@ -180,20 +180,20 @@ public class LeakDetector extends LeakDetectorBase {
                     }
                 }
             } else {
-                updateParent(parent);
-                if (parentReference.isPresent()) {
-                    map.remove(parentReference.get());
-                }
+                updateParent(weakRef);
+                map.remove(weakRef);
             }
         };
-        updateParent(parent);
 
+        updateParent(weakRef);
         listeners.add(sceneListener);
         parent.sceneProperty().addListener(new WeakChangeListener<>(sceneListener));
     }
 
-    private void updateParent(Node parent) {
-        oldParentHistory.put(new WeakRef<Node>(parent), parent.getParent());
+    private void updateParent(WeakRef<Node> parentRef) {
+        if(parentRef.get() != null && parentRef.get().getParent() != null) {
+            oldParentHistory.put(parentRef, new WeakRef<Parent>(parentRef.get().getParent()));
+        }
     }
 
     /**

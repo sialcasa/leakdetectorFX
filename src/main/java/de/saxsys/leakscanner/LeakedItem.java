@@ -14,7 +14,7 @@ public class LeakedItem {
     private WeakRef<Node> node;
     private ObservableList<LeakedItem> children = FXCollections.observableArrayList();
     private LeakedItem parent = null;
-    private Parent oldSceneParent; 
+    private WeakRef<Parent> oldSceneParent; 
 
     public LeakedItem(WeakRef<Node> node) {
         this.node = node;
@@ -44,12 +44,12 @@ public class LeakedItem {
         this.parent = parent;
     }
     
-    public Parent getOldSceneParent() {
+    public WeakRef<Parent> getOldSceneParent() {
         return oldSceneParent;
     }
 
-    public void setOldSceneParent(Parent oldSceneParent) {
-        this.oldSceneParent = oldSceneParent;
+    public void setOldSceneParent(WeakRef<Parent> weakRef) {
+        this.oldSceneParent = weakRef;
     }
 
     public StringProperty nodeProperty() {
