@@ -1,9 +1,5 @@
 package de.saxsys.leakscanner.gui;
 
-import java.io.IOException;
-import java.net.URL;
-import java.util.ResourceBundle;
-
 import de.saxsys.leakscanner.LeakedItem;
 import de.saxsys.leakscanner.WeakRef;
 import de.saxsys.leakscanner.leakdetector.LeakDetector;
@@ -14,15 +10,13 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeTableColumn;
-import javafx.scene.control.TreeTableView;
+import javafx.scene.Parent;
+import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
+
+import java.io.IOException;
+import java.net.URL;
+import java.util.ResourceBundle;
 
 public class LeakScannerView extends BorderPane implements Initializable {
 
@@ -45,6 +39,9 @@ public class LeakScannerView extends BorderPane implements Initializable {
     private ListView<WeakRef<Node>> whiteListView;
 
     final LeakDetector leakDetector;
+
+    private Parent lastParent;
+
 
     public LeakScannerView(LeakDetector leakDetector) {
         this.leakDetector = leakDetector;
@@ -80,6 +77,17 @@ public class LeakScannerView extends BorderPane implements Initializable {
         rootContextMenu.getItems().add(m);
 
         leakTreeTableView.setContextMenu(rootContextMenu);
+
+        //change the border color of parent
+        leakTreeTableView.setOnMouseReleased(event -> {
+            final TreeItem<LeakedItem> target = leakTreeTableView.getSelectionModel().getSelectedItem();
+            if(lastParent!=null){
+                lastParent.setStyle("");
+            }
+            lastParent = target.getValue().getOldSceneParent().get();
+            target.getValue().getOldSceneParent().get().setStyle("-fx-border-color: blue ;\n" +
+                    "    -fx-border-width: 8 ; ");
+        });
 
         nodeCol.setCellValueFactory(w -> {
             if (leakTreeTableView.getRoot() == w.getValue()) {
