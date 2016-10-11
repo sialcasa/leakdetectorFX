@@ -85,8 +85,11 @@ public class LeakScannerView extends BorderPane implements Initializable {
                 lastParent.get().setStyle("");
             }
             lastParent =target.getValue().getOldSceneParent();
-            target.getValue().getOldSceneParent().get().setStyle("-fx-border-color: blue ;\n" +
-                    "    -fx-border-width: 8 ; ");
+            if(lastParent!=null){
+                lastParent.get().setStyle("-fx-border-color: blue ;\n" +
+                        "    -fx-border-width: 8 ; ");
+            }
+
         });
 
         nodeCol.setCellValueFactory(w -> {
