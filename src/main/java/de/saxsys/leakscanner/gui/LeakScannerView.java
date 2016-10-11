@@ -40,7 +40,7 @@ public class LeakScannerView extends BorderPane implements Initializable {
 
     final LeakDetector leakDetector;
 
-    private Parent lastParent;
+    private WeakRef<Parent> lastParent;
 
 
     public LeakScannerView(LeakDetector leakDetector) {
@@ -82,9 +82,9 @@ public class LeakScannerView extends BorderPane implements Initializable {
         leakTreeTableView.setOnMouseReleased(event -> {
             final TreeItem<LeakedItem> target = leakTreeTableView.getSelectionModel().getSelectedItem();
             if(lastParent!=null){
-                lastParent.setStyle("");
+                lastParent.get().setStyle("");
             }
-            lastParent = target.getValue().getOldSceneParent().get();
+            lastParent =target.getValue().getOldSceneParent();
             target.getValue().getOldSceneParent().get().setStyle("-fx-border-color: blue ;\n" +
                     "    -fx-border-width: 8 ; ");
         });
