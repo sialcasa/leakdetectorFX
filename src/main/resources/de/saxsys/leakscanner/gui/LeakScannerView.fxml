@@ -15,7 +15,7 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
 
-<fx:root maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" stylesheets="@leakScanner.css" type="BorderPane" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" stylesheets="@leakScanner.css" type="BorderPane" xmlns="http://javafx.com/javafx/8.0.101" xmlns:fx="http://javafx.com/fxml/1">
     <top>
         <MenuBar BorderPane.alignment="CENTER">
             <menus>
@@ -53,7 +53,7 @@
                                 <TreeTableView fx:id="leakTreeTableView" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
                                     <columns>
                                         <TreeTableColumn fx:id="nodeCol" prefWidth="425.0" text="Node" />
-                                        <TreeTableColumn fx:id="oldParentCol" prefWidth="140.0" text="Parent" />
+                                        <TreeTableColumn fx:id="oldParentCol" prefWidth="140.0" text="last Parent" />
                                         <TreeTableColumn fx:id="hashCodeCol" prefWidth="100.0" text="Hashcode" />
                                     </columns>
                                 </TreeTableView>
