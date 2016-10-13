@@ -227,9 +227,18 @@ public class LeakDetector extends LeakDetectorBase {
     public void removeFromWhiteList(WeakRef<Node> item) {
         System.out.println("want to removeFromWhiteList "+item.get());
         whiteList.remove(item);
-        if(item.get().getScene()==null){
+        if(item.get()!=null && item.get().getScene()==null){
             insertWeakRefIntoMap(item);
             System.out.println("added to map "+item.get());
+            if (isParent(item.get())) {
+                if (((Parent) item.get()) != null) {
+                    ObservableList<Node> nodes = ((Parent) item.get()).getChildrenUnmodifiable();
+                    for(Node node:nodes){
+                        removeFromWhiteList(new WeakRef<>(node));
+                    }
+                }
+
+            }
         }
 
     }

@@ -108,11 +108,11 @@ public class LeakScannerView extends BorderPane implements Initializable {
             return item.hashCodeProperty();
         });
 
-        oldParentCol.setCellValueFactory(w -> {
-            LeakedItem item = w.getValue().getValue();
-
-            return item.oldParentProperty();
-        });
+       oldParentCol.setCellFactory(param -> {
+           MixedTreeCell summaryCell = new MixedTreeCell();
+           p
+           return summaryCell;
+       });
 
         whiteListView.setItems(leakDetector.getWhiteList());
         addContextMenuWhitelist();
