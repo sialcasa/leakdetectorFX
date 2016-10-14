@@ -7,37 +7,36 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.TreeTableCell;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.HBox;
 
 /**
  * Created by maximilian.grosser on 12.10.2016.
  */
 public class MixedTreeCell extends TreeTableCell<LeakedItem,String> {
-    VBox vBox;
+    HBox vBox;
     Label lastParentLabel;
     ImageView imageView;
 
     public MixedTreeCell(){
-        vBox=new VBox();
+        vBox=new HBox();
         vBox.setAlignment(Pos.CENTER);
-        lastParentLabel= new Label();
+        lastParentLabel= new Label("label");
         imageView= new ImageView();
         imageView.setFitWidth(20);
         imageView.setFitHeight(20);
-        vBox.getChildren().addAll(imageView,lastParentLabel, GlyphsDude.createIcon(FontAwesomeIcon.SEARCH));
-        setGraphic(vBox);
+        vBox.getChildren().addAll(lastParentLabel, GlyphsDude.createIcon(FontAwesomeIcon.SEARCH));
+//        setGraphic(vBox);
 
     }
 
     @Override
     public void updateItem(String item, boolean showImageView){
-        super.updateItem(item,showImageView);
-        lastParentLabel
-setText("vhuiijk");
-//        if(showImageView){
-//            vBox.getChildren().addAll(GlyphsDude.createIcon(FontAwesomeIcon.SEARCH));
+        System.out.println(item);
 
-//        }
+        if(item!=null){
+            lastParentLabel.setText(item);
+            setGraphic(vBox);
+        }
 
 
 

@@ -33,7 +33,8 @@ public class LeakScannerView extends BorderPane implements Initializable {
     private TreeTableColumn<LeakedItem, Number> hashCodeCol;
 
     @FXML
-    private TreeTableColumn<LeakedItem, String> oldParentCol;
+    private TreeTableColumn<LeakedItem,String> oldParentCol;
+
 
     @FXML
     private ListView<WeakRef<Node>> whiteListView;
@@ -78,12 +79,14 @@ public class LeakScannerView extends BorderPane implements Initializable {
 
         leakTreeTableView.setContextMenu(rootContextMenu);
 
-        //change the border color of parent
+//        change the border color of parent
         leakTreeTableView.setOnMouseReleased(event -> {
             final TreeItem<LeakedItem> target = leakTreeTableView.getSelectionModel().getSelectedItem();
             if(lastParent!=null){
                 lastParent.get().setStyle("");
             }
+            System.out.println(target.getValue());
+            System.out.println(target.getValue().getOldSceneParent());
             lastParent =target.getValue().getOldSceneParent();
             if(lastParent!=null){
                 lastParent.get().setStyle("-fx-border-color: blue ;\n" +
@@ -108,11 +111,26 @@ public class LeakScannerView extends BorderPane implements Initializable {
             return item.hashCodeProperty();
         });
 
+        oldParentCol.setCellValueFactory(w -> {
+            LeakedItem item = w.getValue().getValue();
+
+            return item.oldParentProperty();
+        });
+
+
        oldParentCol.setCellFactory(param -> {
-           MixedTreeCell summaryCell = new MixedTreeCell();
-           p
+           TreeTableCell<LeakedItem, String> summaryCell = new MixedTreeCell();
            return summaryCell;
        });
+
+//        oldParentCol.setCellFactory(new Callback<TreeTableColumn<LeakedItem, LeakedItem>, TreeTableCell<LeakedItem, LeakedItem>>() {
+//            @Override
+//            public TreeTableCell<LeakedItem, LeakedItem> call(TreeTableColumn<LeakedItem, LeakedItem> param) {
+//                TreeTableCell<LeakedItem, LeakedItem> summaryCell = new MixedTreeCell();
+//
+//                return summaryCell;
+//            }
+//        });
 
         whiteListView.setItems(leakDetector.getWhiteList());
         addContextMenuWhitelist();
