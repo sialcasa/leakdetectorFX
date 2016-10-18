@@ -33,7 +33,7 @@ public class LeakScannerView extends BorderPane implements Initializable {
     private TreeTableColumn<LeakedItem, Number> hashCodeCol;
 
     @FXML
-    private TreeTableColumn<LeakedItem,String> oldParentCol;
+    private TreeTableColumn<LeakedItem, String> oldParentCol;
 
 
     @FXML
@@ -82,15 +82,18 @@ public class LeakScannerView extends BorderPane implements Initializable {
 //        change the border color of parent
         leakTreeTableView.setOnMouseReleased(event -> {
             final TreeItem<LeakedItem> target = leakTreeTableView.getSelectionModel().getSelectedItem();
-            if(lastParent!=null){
-                lastParent.get().setStyle("");
-            }
-            System.out.println(target.getValue());
-            System.out.println(target.getValue().getOldSceneParent());
-            lastParent =target.getValue().getOldSceneParent();
-            if(lastParent!=null){
-                lastParent.get().setStyle("-fx-border-color: blue ;\n" +
-                        "    -fx-border-width: 8 ; ");
+            if (target != null) {
+                if (lastParent != null) {
+                    lastParent.get().setStyle("");
+                }
+                System.out.println("target " + target);
+//            System.out.println(target.getValue().getOldSceneParent());
+
+                lastParent = target.getValue().getOldSceneParent();
+                if (lastParent != null) {
+                    lastParent.get().setStyle("-fx-border-color: blue ;\n" +
+                            "    -fx-border-width: 8 ; ");
+                }
             }
 
         });
@@ -118,10 +121,10 @@ public class LeakScannerView extends BorderPane implements Initializable {
         });
 
 
-       oldParentCol.setCellFactory(param -> {
-           TreeTableCell<LeakedItem, String> summaryCell = new MixedTreeCell();
-           return summaryCell;
-       });
+        oldParentCol.setCellFactory(param -> {
+            TreeTableCell<LeakedItem, String> summaryCell = new MixedTreeCell();
+            return summaryCell;
+        });
 
 //        oldParentCol.setCellFactory(new Callback<TreeTableColumn<LeakedItem, LeakedItem>, TreeTableCell<LeakedItem, LeakedItem>>() {
 //            @Override

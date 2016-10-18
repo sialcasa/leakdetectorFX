@@ -25,6 +25,7 @@ public class MixedTreeCell extends TreeTableCell<LeakedItem,String> {
         imageView.setFitWidth(20);
         imageView.setFitHeight(20);
         vBox.getChildren().addAll(lastParentLabel, GlyphsDude.createIcon(FontAwesomeIcon.SEARCH));
+        vBox.setSpacing(5);
 //        setGraphic(vBox);
 
     }
