@@ -37,6 +37,9 @@ public class MixedTreeCell extends TreeTableCell<LeakedItem,String> {
         if(item!=null){
             lastParentLabel.setText(item);
             setGraphic(vBox);
+        }else{
+            lastParentLabel.setText("");
+            setGraphic(null);
         }
 
 

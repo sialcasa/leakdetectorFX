@@ -102,22 +102,37 @@ public class LeakScannerView extends BorderPane implements Initializable {
             if (leakTreeTableView.getRoot() == w.getValue()) {
                 return new SimpleStringProperty("Scene");
             } else {
-                LeakedItem item = w.getValue().getValue();
+                if(w!=null && w.getValue()!=null) {
+                    LeakedItem item = w.getValue().getValue();
 
-                return item.nodeProperty();
+                    return item.nodeProperty();
+                }else {
+                    return null;
+                }
             }
         });
 
         hashCodeCol.setCellValueFactory(w -> {
-            LeakedItem item = w.getValue().getValue();
+            if(w!=null && w.getValue()!=null) {
+                LeakedItem item = w.getValue().getValue();
 
-            return item.hashCodeProperty();
+                return item.hashCodeProperty();
+            }else {
+                return null;
+            }
+
         });
 
         oldParentCol.setCellValueFactory(w -> {
-            LeakedItem item = w.getValue().getValue();
+            if(w!=null && w.getValue()!=null) {
+                LeakedItem item = w.getValue().getValue();
 
-            return item.oldParentProperty();
+                return item.oldParentProperty();
+            }else {
+                return null;
+            }
+
+
         });
 
 

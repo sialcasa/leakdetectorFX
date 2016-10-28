@@ -69,7 +69,7 @@ public class LeakedItem {
     }
     
     public StringProperty oldParentProperty() {
-        if (oldSceneParent == null) {
+        if (oldSceneParent == null || oldSceneParent.get()==null) {
             return null;
         } else {
             return new SimpleStringProperty(getOldSceneParent().get().toString());
