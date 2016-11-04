@@ -3,6 +3,7 @@ package de.saxsys.leakscanner.gui;
 import de.saxsys.leakscanner.LeakedItem;
 import de.saxsys.leakscanner.WeakRef;
 import de.saxsys.leakscanner.leakdetector.LeakDetector;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.MapChangeListener;
 import javafx.event.ActionEvent;
@@ -56,7 +57,7 @@ public class LeakScannerView extends BorderPane implements Initializable {
         }
 
         leakDetector.getLeakedObjects().addListener((MapChangeListener<WeakRef<Node>, LeakedItem>) change -> {
-            buildTree();
+            Platform.runLater(()->buildTree());
         });
 
         TreeItem<LeakedItem> rootItem = new TreeItem<LeakedItem>(new LeakedItem(new WeakRef<Node>(new Label("Scene"))));
