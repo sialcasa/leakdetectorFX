@@ -3,14 +3,16 @@ package de.saxsys.leakscanner.gui;
 import de.saxsys.leakscanner.LeakedItem;
 import de.saxsys.leakscanner.WeakRef;
 import de.saxsys.leakscanner.leakdetector.LeakDetector;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
 import javafx.collections.MapChangeListener;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 
@@ -55,7 +57,7 @@ public class LeakScannerView extends BorderPane implements Initializable {
         }
 
         leakDetector.getLeakedObjects().addListener((MapChangeListener<WeakRef<Node>, LeakedItem>) change -> {
-            buildTree();
+            Platform.runLater(() -> buildTree());
         });
 
         TreeItem<LeakedItem> rootItem = new TreeItem<LeakedItem>(new LeakedItem(new WeakRef<Node>(new Label("Scene"))));
@@ -91,15 +93,26 @@ public class LeakScannerView extends BorderPane implements Initializable {
         });
 
         hashCodeCol.setCellValueFactory(w -> {
-            LeakedItem item = w.getValue().getValue();
+            if(w!=null && w.getValue()!=null){
+                LeakedItem item = w.getValue().getValue();
 
-            return item.hashCodeProperty();
+                return item.hashCodeProperty();
+            }else {
+                return null;
+            }
+
         });
 
         oldParentCol.setCellValueFactory(w -> {
+            if(w!=null && w.getValue()!=null){
             LeakedItem item = w.getValue().getValue();
+                return item.oldParentProperty();
 
-            return item.oldParentProperty();
+            }else {
+                return null;
+            }
+
+
         });
 
         whiteListView.setItems(leakDetector.getWhiteList());
@@ -112,9 +125,11 @@ public class LeakScannerView extends BorderPane implements Initializable {
     }
 
     private void buildTree() {
+
         leakTreeTableView.getRoot().getChildren().clear();
 
-        for (LeakedItem child : leakDetector.getRootItem().getChildren()) {
+        final ObservableList<LeakedItem> children = FXCollections.observableArrayList(leakDetector.getRootItem().getChildren());
+        for (LeakedItem child : children) {
             createTreeItemForLeakedItem(child, leakTreeTableView.getRoot());
         }
     }

@@ -176,6 +176,7 @@ public class LeakDetector extends LeakDetectorBase {
             if (newValue == null) {
                 if (!parentReference.isPresent()) {
                     if (map.get(weakRef) == null) {
+                        System.out.println("insert into map "+weakRef.get());
                         insertWeakRefIntoMap(weakRef);
                     }
                 }
