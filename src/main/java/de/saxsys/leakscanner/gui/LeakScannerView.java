@@ -57,7 +57,13 @@ public class LeakScannerView extends BorderPane implements Initializable {
         }
 
         leakDetector.getLeakedObjects().addListener((MapChangeListener<WeakRef<Node>, LeakedItem>) change -> {
-            Platform.runLater(()->buildTree());
+
+            //blue border changes Region
+            if(change!=null &&change.getKey()!=null && change.getKey().get()!=null && !change.getKey().get().toString().contains("Region")){
+                System.out.println("item changed: "+change.getKey().get());
+                Platform.runLater(()->buildTree());
+            }
+
         });
 
         TreeItem<LeakedItem> rootItem = new TreeItem<LeakedItem>(new LeakedItem(new WeakRef<Node>(new Label("Scene"))));
@@ -80,7 +86,7 @@ public class LeakScannerView extends BorderPane implements Initializable {
 
         leakTreeTableView.setContextMenu(rootContextMenu);
 
-//        change the border color of parent
+//        change the border-color of old parent to blue
         leakTreeTableView.setOnMouseReleased(event -> {
             final TreeItem<LeakedItem> target = leakTreeTableView.getSelectionModel().getSelectedItem();
             if (target != null) {
@@ -88,8 +94,6 @@ public class LeakScannerView extends BorderPane implements Initializable {
                     lastParent.get().setStyle("");
                 }
                 System.out.println("target " + target);
-//            System.out.println(target.getValue().getOldSceneParent());
-
                 lastParent = target.getValue().getOldSceneParent();
                 if (lastParent != null) {
                     lastParent.get().setStyle("-fx-border-color: blue ;\n" +
@@ -161,6 +165,7 @@ public class LeakScannerView extends BorderPane implements Initializable {
     }
 
     private void buildTree() {
+        System.out.println("buildTree");
         leakTreeTableView.getRoot().getChildren().clear();
 
         for (LeakedItem child : leakDetector.getRootItem().getChildren()) {

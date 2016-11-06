@@ -9,9 +9,7 @@ import javafx.scene.control.TreeTableCell;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 
-/**
- * Created by maximilian.grosser on 12.10.2016.
- */
+
 public class MixedTreeCell extends TreeTableCell<LeakedItem,String> {
     HBox vBox;
     Label lastParentLabel;
@@ -32,8 +30,6 @@ public class MixedTreeCell extends TreeTableCell<LeakedItem,String> {
 
     @Override
     public void updateItem(String item, boolean showImageView){
-        System.out.println(item);
-
         if(item!=null){
             lastParentLabel.setText(item);
             setGraphic(vBox);
