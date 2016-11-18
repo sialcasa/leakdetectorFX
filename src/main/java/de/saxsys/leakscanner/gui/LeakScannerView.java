@@ -125,13 +125,15 @@ public class LeakScannerView extends BorderPane implements Initializable {
     }
 
     private void buildTree() {
+        synchronized (this){
+            leakTreeTableView.getRoot().getChildren().clear();
 
-        leakTreeTableView.getRoot().getChildren().clear();
-
-        final ObservableList<LeakedItem> children = FXCollections.observableArrayList(leakDetector.getRootItem().getChildren());
-        for (LeakedItem child : children) {
-            createTreeItemForLeakedItem(child, leakTreeTableView.getRoot());
+            final ObservableList<LeakedItem> children = FXCollections.observableArrayList(leakDetector.getRootItem().getChildren());
+            for (LeakedItem child : children) {
+                createTreeItemForLeakedItem(child, leakTreeTableView.getRoot());
+            }
         }
+
     }
 
     private void createTreeItemForLeakedItem(LeakedItem leak, TreeItem<LeakedItem> parent) {

@@ -2,6 +2,7 @@ package de.saxsys.leakscanner.leakdetector;
 
 import de.saxsys.leakscanner.LeakedItem;
 import de.saxsys.leakscanner.WeakRef;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.WeakChangeListener;
 import javafx.collections.FXCollections;
@@ -203,12 +204,14 @@ public class LeakDetector extends LeakDetectorBase {
      * @return whether the GC penetration should get continued
      */
     public boolean checkLeaksAndContinueGC() {
-        synchronized (this) {
-            List<WeakRef<Node>> collect =
-                    map.keySet().stream().filter(ref -> (ref.get() == null)).collect(Collectors.toList());
+        Platform.runLater(() -> {
+            synchronized (this) {
+                List<WeakRef<Node>> collect =
+                        map.keySet().stream().filter(ref -> (ref.get() == null)).collect(Collectors.toList());
 
-            map.keySet().removeAll(collect);
-        }
+                map.keySet().removeAll(collect);
+            }
+        });
         // Continue GC
         return true;
     }
