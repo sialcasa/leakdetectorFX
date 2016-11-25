@@ -7,6 +7,7 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.MapChangeListener;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -22,6 +23,8 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 public class LeakScannerView extends BorderPane implements Initializable {
+
+    private boolean changes=false;
 
     @FXML
     private TextField filterTextField;
@@ -61,20 +64,25 @@ public class LeakScannerView extends BorderPane implements Initializable {
         }
         buildTreeTimeLine=  new Timeline();
         buildTreeTimeLine.getKeyFrames().addAll(new KeyFrame(Duration.seconds(3), event -> {
-            Platform.runLater(()->buildTree());
+            if(changes){
+                Platform.runLater(()->buildTree());
+                changes=false;
+            }
+
         }));
         buildTreeTimeLine.setCycleCount(Timeline.INDEFINITE);
         buildTreeTimeLine.play();
 
-//        leakDetector.getLeakedObjects().addListener((MapChangeListener<WeakRef<Node>, LeakedItem>) change -> {
-//
-//            //blue border changes Region
+        leakDetector.getLeakedObjects().addListener((MapChangeListener<WeakRef<Node>, LeakedItem>) change -> {
+
+            //blue border changes Region
 //            if(change!=null &&change.getKey()!=null && change.getKey().get()!=null && !change.getKey().get().toString().contains("Region")){
 //                System.out.println("item changed: "+change.getKey().get());
 ////                Platform.runLater(()->buildTree());
 //            }
-//
-//        });
+            changes=true;
+
+        });
 
         TreeItem<LeakedItem> rootItem = new TreeItem<LeakedItem>(new LeakedItem(new WeakRef<Node>(new Label("Scene"))));
         rootItem.setExpanded(true);
