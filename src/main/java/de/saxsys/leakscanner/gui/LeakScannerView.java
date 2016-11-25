@@ -3,9 +3,10 @@ package de.saxsys.leakscanner.gui;
 import de.saxsys.leakscanner.LeakedItem;
 import de.saxsys.leakscanner.WeakRef;
 import de.saxsys.leakscanner.leakdetector.LeakDetector;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.collections.MapChangeListener;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -14,6 +15,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
+import javafx.util.Duration;
 
 import java.io.IOException;
 import java.net.URL;
@@ -44,6 +46,8 @@ public class LeakScannerView extends BorderPane implements Initializable {
 
     private WeakRef<Parent> lastParent;
 
+    private Timeline buildTreeTimeLine;
+
 
     public LeakScannerView(LeakDetector leakDetector) {
         this.leakDetector = leakDetector;
@@ -55,16 +59,22 @@ public class LeakScannerView extends BorderPane implements Initializable {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        buildTreeTimeLine=  new Timeline();
+        buildTreeTimeLine.getKeyFrames().addAll(new KeyFrame(Duration.seconds(3), event -> {
+            Platform.runLater(()->buildTree());
+        }));
+        buildTreeTimeLine.setCycleCount(Timeline.INDEFINITE);
+        buildTreeTimeLine.play();
 
-        leakDetector.getLeakedObjects().addListener((MapChangeListener<WeakRef<Node>, LeakedItem>) change -> {
-
-            //blue border changes Region
-            if(change!=null &&change.getKey()!=null && change.getKey().get()!=null && !change.getKey().get().toString().contains("Region")){
-                System.out.println("item changed: "+change.getKey().get());
-                Platform.runLater(()->buildTree());
-            }
-
-        });
+//        leakDetector.getLeakedObjects().addListener((MapChangeListener<WeakRef<Node>, LeakedItem>) change -> {
+//
+//            //blue border changes Region
+//            if(change!=null &&change.getKey()!=null && change.getKey().get()!=null && !change.getKey().get().toString().contains("Region")){
+//                System.out.println("item changed: "+change.getKey().get());
+////                Platform.runLater(()->buildTree());
+//            }
+//
+//        });
 
         TreeItem<LeakedItem> rootItem = new TreeItem<LeakedItem>(new LeakedItem(new WeakRef<Node>(new Label("Scene"))));
         rootItem.setExpanded(true);
@@ -165,12 +175,15 @@ public class LeakScannerView extends BorderPane implements Initializable {
     }
 
     private void buildTree() {
-        System.out.println("buildTree");
-        leakTreeTableView.getRoot().getChildren().clear();
+        synchronized (this){
+            System.out.println("buildTree");
+            leakTreeTableView.getRoot().getChildren().clear();
 
-        for (LeakedItem child : leakDetector.getRootItem().getChildren()) {
-            createTreeItemForLeakedItem(child, leakTreeTableView.getRoot());
+            for (LeakedItem child : leakDetector.getRootItem().getChildren()) {
+                createTreeItemForLeakedItem(child, leakTreeTableView.getRoot());
+            }
         }
+
     }
 
     private void createTreeItemForLeakedItem(LeakedItem leak, TreeItem<LeakedItem> parent) {
