@@ -30,7 +30,7 @@ import java.util.ResourceBundle;
 public class LeakScannerView extends BorderPane implements Initializable {
 
     private boolean changes = false;
-    private DoubleProperty delay = new SimpleDoubleProperty(20);
+    private DoubleProperty delay = new SimpleDoubleProperty(1);
 
     @FXML
     private TextField filterTextField;
@@ -54,6 +54,8 @@ public class LeakScannerView extends BorderPane implements Initializable {
     private CheckBox delayCheckBox;
     @FXML
     private TextField delayTextfield;
+    @FXML
+    private Label delayLabel;
 
     final LeakDetector leakDetector;
 
@@ -103,7 +105,7 @@ public class LeakScannerView extends BorderPane implements Initializable {
         //no delay
         double delay = Double.parseDouble(delayTextfield.getText());
         if (!delayCheckBox.isSelected()) {
-            System.out.println("no delay "+delayCheckBox.isSelected());
+//            System.out.println("delayCheckBox.isSelected "+delayCheckBox.isSelected());
             //blue border changes Region
             if (change != null && change.getKey() != null && change.getKey().get() != null && !change.getKey().get().toString().contains("Region")) {
 //                System.out.println("item changed: "+change.getKey().get());
@@ -111,7 +113,7 @@ public class LeakScannerView extends BorderPane implements Initializable {
             }
         } else {
             changes = true;
-            System.out.println("delay2 "+delayCheckBox.isSelected()+delay);
+//            System.out.println("delay2 "+delayCheckBox.isSelected()+delay);
             buildTreeTimeLine.play();
         }
     }
@@ -119,7 +121,9 @@ public class LeakScannerView extends BorderPane implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         delayTextfield.setText(String.valueOf(delay.get()));
-
+        delayTextfield.visibleProperty().bind(delayCheckBox.selectedProperty());
+        delayCheckBox.setTooltip(new Tooltip("Activate to avoid seeing elements which are garbage collected the next second"));
+        delayLabel.setTooltip(new Tooltip("Activate to avoid seeing elements which are garbage collected the next second"));
         StringConverter<Number> converter = new NumberStringConverter();
         Bindings.bindBidirectional(delayTextfield.textProperty(),delay,converter);
 
@@ -149,16 +153,27 @@ public class LeakScannerView extends BorderPane implements Initializable {
 
         leakTreeTableView.setContextMenu(rootContextMenu);
 
+        leakTreeTableView.getFocusModel().focusedCellProperty().addListener((obs, oldVal, newVal) -> {
+            System.out.println(newVal.getColumn());
+
+//            if(newVal.getTableColumn() != null){
+//                leakTreeTableView.getSelectionModel().selectRange(0, newVal.getTableColumn(), leakTreeTableView.getChildrenUnmodifiable().size(), newVal.getTableColumn());
+//                System.out.println("Selected TableColumn: "+ newVal.getTableColumn().getText());
+//                System.out.println("Selected column index: "+ newVal.getColumn());
+//            }
+        });
+
 //        change the border-color of old parent to blue
         leakTreeTableView.setOnMouseReleased(event -> {
             final TreeItem<LeakedItem> target = leakTreeTableView.getSelectionModel().getSelectedItem();
-            if (target != null) {
+            if (target != null ) {
                 if (lastParent != null) {
                     lastParent.get().setStyle("");
                 }
                 System.out.println("target " + target);
+
                 lastParent = target.getValue().getOldSceneParent();
-                if (lastParent != null) {
+                if (lastParent != null &&leakTreeTableView.getFocusModel().focusedCellProperty().get().getColumn()==1) {
                     lastParent.get().setStyle("-fx-border-color: blue ;\n" +
                             "    -fx-border-width: 8 ; ");
                 }

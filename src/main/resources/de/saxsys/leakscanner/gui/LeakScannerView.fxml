@@ -51,11 +51,11 @@
                                     <items>
                                         <Button mnemonicParsing="false" onAction="#onGcButtonPressed" text="GC" />
                                         <TextField fx:id="filterTextField" promptText="Filter for class" />
-                              <HBox>
+                              <HBox alignment="CENTER">
                                  <children>
-                                    <CheckBox fx:id="delayCheckBox" mnemonicParsing="false" />
-                                    <Label text="Delay (s)" />
-                                    <TextField fx:id="delayTextfield" />
+                                    <CheckBox fx:id="delayCheckBox" alignment="CENTER" mnemonicParsing="false" nodeOrientation="LEFT_TO_RIGHT" />
+                                    <Label fx:id="delayLabel" alignment="CENTER" text="Delay (s)" />
+                                    <TextField fx:id="delayTextfield" alignment="CENTER" visible="false" />
                                  </children>
                               </HBox>
                                     </items>
